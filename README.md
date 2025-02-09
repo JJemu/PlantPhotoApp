@@ -6,7 +6,7 @@ Plant Photo App is a React Native application that allows users to capture and m
 
 - Capture photos of plants using your camera
 - View plant photos in a gallery-like grid
-- Edit plant details, including name and notes and delete them
+- Edit plant details, including name, notes and delete
 - Persistent storage using AsyncStorage
 - Bottom navigation bar for easy navigation between screens
 
