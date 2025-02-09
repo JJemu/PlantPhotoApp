@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, Image, TextInput, Alert, Platform, PermissionsAndroid } from 'react-native';
 import styled, { ThemeProvider } from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
 import Icons from 'react-native-vector-icons/FontAwesome';
 import { launchCamera } from 'react-native-image-picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppTheme } from '../theme/Theme';
 import { Button } from '../components/Button';
+import { PlantContext } from '../context/PlantContext';
 
 const Container = styled(View)`
   flex: 1;
@@ -52,12 +52,14 @@ const BackButtonText = styled.Text`
 
 const ScanScreen = () => {
   const navigation = useNavigation();
+  const { savePlant } = useContext(PlantContext);
   const [image, setImage] = useState(null);
   const [name, setName] = useState('');
   const [notes, setNotes] = useState('');
 
   useEffect(() => {
     takePhoto();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const requestCameraPermission = async () => {
@@ -84,16 +86,17 @@ const ScanScreen = () => {
         return false;
       }
     }
-    return true; // iOS handles permissions automatically
+    return true;
   };
 
   const takePhoto = async () => {
     const hasPermission = await requestCameraPermission();
+    // eslint-disable-next-line curly
     if (!hasPermission) return;
 
     const options = { mediaType: 'photo', cameraType: 'back' };
     launchCamera(options, (response) => {
-      console.log(response); // Debugging: log the response
+      console.log(response);
       if (response.didCancel) {
         Alert.alert('Camera Cancelled', 'You did not take a photo.');
         navigation.goBack();
@@ -109,31 +112,25 @@ const ScanScreen = () => {
     });
   };
 
-  const savePlant = async () => {
+  const generateUniqueId = () => {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  };
+
+  const handleSave = async () => {
     if (!name.trim()) {
+      // eslint-disable-next-line no-alert
       alert('Please enter a plant name.');
       return;
     }
     const newPlant = {
+      id: generateUniqueId(),
       name,
       image,
       notes,
       date: new Date().toLocaleDateString(),
     };
-
-    try {
-      // Get the existing plants from storage
-      const existingPlants = await AsyncStorage.getItem('plants');
-      const plantsArray = existingPlants ? JSON.parse(existingPlants) : [];
-      // Add the new plant to the array
-      plantsArray.push(newPlant);
-      // Save the updated array back to storage
-      await AsyncStorage.setItem('plants', JSON.stringify(plantsArray));
-      navigation.navigate('List');
-    } catch (error) {
-      console.error('Error saving plant:', error);
-      Alert.alert('Error', 'Failed to save plant.');
-    }
+    await savePlant(newPlant);
+    navigation.navigate('List');
   };
 
   const theme = new AppTheme();
@@ -152,7 +149,7 @@ const ScanScreen = () => {
             <PlantImage source={{ uri: image }} />
             <Input placeholder="Plant Name" value={name} onChangeText={setName} />
             <Input placeholder="Notes" value={notes} onChangeText={setNotes} />
-            <Button title="Save" onPress={savePlant} />
+            <Button title="Save" onPress={handleSave} />
           </DetailsContainer>
         )}
       </Container>

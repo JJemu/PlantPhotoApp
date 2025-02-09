@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
+import React, { useContext, useEffect } from 'react';
+import { View, FlatList, TouchableOpacity, Image, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import styled, { ThemeProvider } from 'styled-components/native';
+import { PlantContext } from '../context/PlantContext';
+import { AppTheme } from '../theme/Theme';
 import { Button } from '../components/Button';
-import { BodyText, AppTheme } from '../theme/Theme';
 
 const Container = styled(View)`
   flex: 1;
@@ -12,21 +12,43 @@ const Container = styled(View)`
   background-color: ${({ theme }) => theme.color.lightGray};
 `;
 
-const MessageText = styled(BodyText)`
+const MessageText = styled(Text)`
   text-align: center;
   margin-top: 20px;
+  color: ${({ theme }) => theme.color.gray};
 `;
 
-const PlantItem = styled(View)`
-  flex-direction: row;
-  align-items: center;
-  margin-bottom: 10px;
+const PlantItem = styled(TouchableOpacity)`
+  flex: 1;
+  margin: 5px;
+  position: relative;
 `;
 
 const PlantImage = styled(Image)`
-  width: 50px;
-  height: 50px;
-  margin-right: 10px;
+  width: 100%;
+  height: 200px;
+  border-radius: 10px;
+`;
+
+const PlantNameOverlay = styled(View)`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  ${PlantItem}:hover & {
+    opacity: 1;
+  }
+`;
+
+const PlantNameText = styled(Text)`
+  color: white;
+  text-align: center;
 `;
 
 const ButtonContainer = styled(View)`
@@ -39,24 +61,14 @@ const ButtonContainer = styled(View)`
 const ListScreen = () => {
   const theme = new AppTheme();
   const navigation = useNavigation();
-  const [plants, setPlants] = useState([]);
-
-  const loadPlants = async () => {
-    try {
-      const storedPlants = await AsyncStorage.getItem('plants');
-      if (storedPlants) {
-        setPlants(JSON.parse(storedPlants));
-      }
-    } catch (error) {
-      console.error('Error loading plants:', error);
-    }
-  };
+  const { plants, loadPlants } = useContext(PlantContext);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       loadPlants();
     });
     return unsubscribe;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation]);
 
   return (
@@ -68,13 +80,15 @@ const ListScreen = () => {
           <FlatList
             data={plants}
             keyExtractor={(item, index) => index.toString()}
+            numColumns={2}
+            key={2}
             renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => navigation.navigate('Details', { plant: item })}>
-                <PlantItem>
-                  {item.image && <PlantImage source={{ uri: item.image }} />}
-                  <Text>{item.name} - {item.date}</Text>
-                </PlantItem>
-              </TouchableOpacity>
+              <PlantItem onPress={() => navigation.navigate('Details', { plant: item })}>
+                <PlantImage source={{ uri: item.image }} />
+                <PlantNameOverlay>
+                  <PlantNameText>{item.name}</PlantNameText>
+                </PlantNameOverlay>
+              </PlantItem>
             )}
           />
         )}

@@ -9,8 +9,8 @@ const Stack = createStackNavigator();
 
 const AppStackNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="BottomTabs" screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="BottomTabs" component={BottomNavBar} />
+    <Stack.Navigator initialRouteName="BottomNavBar" screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="BottomNavBar" component={BottomNavBar} />
       <Stack.Screen name="List" component={ListScreen} />
       <Stack.Screen name="Scan" component={ScanScreen} />
       <Stack.Screen name="Details" component={DetailsScreen} />
