@@ -30,27 +30,6 @@ const PlantImage = styled(Image)`
   border-radius: 10px;
 `;
 
-const PlantNameOverlay = styled(View)`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 10px;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-  opacity: 0;
-  transition: opacity 0.3s;
-  ${PlantItem}:hover & {
-    opacity: 1;
-  }
-`;
-
-const PlantNameText = styled(Text)`
-  color: white;
-  text-align: center;
-`;
-
 const ButtonContainer = styled(View)`
   position: absolute;
   bottom: 20px;
@@ -85,9 +64,6 @@ const ListScreen = () => {
             renderItem={({ item }) => (
               <PlantItem onPress={() => navigation.navigate('Details', { plant: item })}>
                 <PlantImage source={{ uri: item.image }} />
-                <PlantNameOverlay>
-                  <PlantNameText>{item.name}</PlantNameText>
-                </PlantNameOverlay>
               </PlantItem>
             )}
           />

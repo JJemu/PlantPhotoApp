@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View, Image, TextInput, Alert } from 'react-native';
+import { View, Text, Image, TextInput, Alert } from 'react-native';
 import styled, { ThemeProvider } from 'styled-components/native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Button } from '../components/Button';
@@ -8,8 +8,8 @@ import { PlantContext } from '../context/PlantContext';
 
 const Container = styled(View)`
   flex: 1;
-  padding: 20px;
   align-items: center;
+  padding: 20px;
   background-color: ${({ theme }) => theme.color.lightGray};
 `;
 
@@ -42,7 +42,7 @@ const DetailsScreen = () => {
 
   const [name, setName] = useState(plant.name);
   const [notes, setNotes] = useState(plant.notes);
-  const image = useState(plant.image);
+  const [image] = useState(plant.image);
 
   const handleSave = () => {
     const updatedPlant = { ...plant, name, notes, image };
@@ -75,12 +75,12 @@ const DetailsScreen = () => {
         )}
         <Input placeholder="Plant Name" value={name} onChangeText={setName} />
         <Input placeholder="Notes" value={notes} onChangeText={setNotes} />
-        </Container>
-        <ButtonContainer>
-          <Button title="Delete Plant" onPress={handleDelete} variant="danger" />
-        </ButtonContainer>
+      </Container>
         <ButtonContainer>
           <Button title="Save" onPress={handleSave} />
+        </ButtonContainer>
+        <ButtonContainer>
+          <Button title="Delete Plant" onPress={handleDelete} variant="danger" />
         </ButtonContainer>
     </ThemeProvider>
   );
